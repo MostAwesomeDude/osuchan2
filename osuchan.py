@@ -5,7 +5,6 @@ import bottle
 bottle.debug(True)
 import hashlib
 
-DSN="dbname=cs440"
 header="OSUChan"
 
 import models
