@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import String, Integer, DateTime
 from sqlalchemy.ext.declarative import declarative_base
@@ -36,6 +38,11 @@ class Thread(Base):
     author = Column(String)
     board = Column(String, ForeignKey("board.abbreviation"))
 
+    def __init__(self, board, subject, author):
+        self.board = board
+        self.subject = subject
+        self.author = author
+
 class Post(Base):
     __tablename__ = "post"
 
@@ -45,6 +52,14 @@ class Post(Base):
     timestamp = Column(DateTime)
     comment = Column(String)
     email = Column(String)
+
+    def __init__(self, threadid, comment, author, email):
+        self.threadid = threadid
+        self.comment = comment
+        self.author = author
+        self.email = email
+
+        self.timestamp = datetime.datetime.now()
 
 class File(Base):
     __tablename__ = "file"

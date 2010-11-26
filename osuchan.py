@@ -3,20 +3,23 @@
 from bottle import request, route, run, template, view
 import bottle
 bottle.debug(True)
-import psycopg2
 import hashlib
 
 DSN="dbname=cs440"
 header="OSUChan"
 
-conn = psycopg2.connect(DSN)
-curs = conn.cursor()
+import models
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine("sqlite:///test.db")
+sm = sessionmaker(bind=engine)
 
 @route('/')
 @view('index')
 def index():
-    curs.execute("SELECT name, abbreviation from board")
-    boards = curs.fetchall()
+    session = sm()
+    boards = [(b.name, b.abbreviation) for b in session.query(models.Board)]
     return {"title": header, "boards": boards}
 
 @route('/static/:name')
@@ -49,14 +52,21 @@ def comment(board):
     fh.write(datafile.file.read())
     fh.close()
 
-        # Insert thread entry
-    curs.execute("INSERT INTO thread (id, board, subject, author) VALUES (DEFAULT, '%s', '%s', '%s'); SELECT currval('thread_id_seq');" % (board, request.POST['subject'], request.POST['name']))
-    threadid = curs.fetchone()[0]
+    session = sm()
+
+    # Insert thread entry
+    thread = models.Thread(board, request.POST["subject"],
+        request.POST["name"])
+    session.add(thread)
+    session.commit()
+
+    threadid = thread.threadid
     
-        # Insert first post
-    query = "INSERT INTO post (threadid, author, comment, email, file, timestamp) VALUES (%d, '%s', '%s', '%s', '%s', NOW())" % (threadid, request.POST['name'], request.POST['comment'], request.POST['email'], md5sum)
-    curs.execute(query)
-    conn.commit()
+    # Insert first post
+    post = models.Post(threadid, request.POST["comment"],
+        request.POST["name"], request.POST["email"])
+    session.add(post)
+    session.commit()
     
     return "<html><head><meta http-equiv='refresh' content='3;url=http://ponderosa.osuosl.org:1337/%s'></head><body>Message Posted!  Please wait 3 seconds to be redirected back to the board index.</body></html>" % board
 
@@ -80,26 +90,42 @@ def threadcomment(board, thread):
     fh.write(datafile.file.read())
     fh.close()
 
-    query = "INSERT INTO post (threadid, author, comment, email, file, timestamp) VALUES (%s, '%s', '%s', '%s', '%s', NOW())" % (thread, request.POST['name'], request.POST['comment'], request.POST['email'], md5sum)
-    curs.execute(query)
-    conn.commit()
+    session = sm()
+
+    post = models.Post(thread, request.POST["name"], request.POST["comment"],
+    request.POST["email"], md5sum)
+    session.add(post)
+    session.commit()
+
     return "<html><head><meta http-equiv='refresh' content='3;url=http://ponderosa.osuosl.org:1337/%s/%s'></head><body>Message Posted!  Please wait 3 seconds to be redirected back to the thread.</body></html>" % (board, thread)
 
 @route('/:board')
 @view('showboard')
 def showboard(board):
-    curs.execute("SELECT id, subject, author FROM thread WHERE board='%s'" % (board))
-    threads = curs.fetchall()
+    session = sm()
+
+    threads = []
+    query = session.query(models.Thread)
+    for thread in query.filter(models.Thread.board==board):
+        threads.append((thread.id, thread.subject, thread.author))
+
     return dict(title=board, board=board, threads=threads)
 
 @route('/:board/:thread')
 @view('showthread')
 def showthread(board, thread):
-    curs.execute("SELECT subject FROM thread WHERE id=%s" % (thread))
-    subject = curs.fetchone()[0]
-    query = "SELECT id, author, threadid, timestamp, comment, email, file from post WHERE threadid=%s ORDER BY timestamp" % (thread)
-    curs.execute(query)
-    posts = curs.fetchall()
-    return dict(title = subject, board=board, posts=posts, thread=thread)
+    session = sm()
+
+    query = session.query(models.Thread).filter(models.Thread.id==thread)
+    subject = query.one().subject
+
+    query = session.query(models.Post).filter(models.Post.threadid==thread)
+    query = query.order_by(models.Post.timestamp)
+    posts = []
+    for post in query:
+        posts.append((post.id, post.author, post.threadid, post.timestamp,
+        post.comment, post.email, post.file))
+
+    return dict(title=subject, board=board, posts=posts, thread=thread)
 
 run(host='0.0.0.0', port=1337)
