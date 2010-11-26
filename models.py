@@ -2,6 +2,7 @@ import datetime
 
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import String, Integer, DateTime
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -48,14 +49,16 @@ class Post(Base):
 
     id = Column(Integer, primary_key=True)
     author = Column(String, nullable=False)
-    threadid = Column(Integer, ForeignKey("thread.id"))
-    timestamp = Column(DateTime)
+    threadid = Column(Integer, ForeignKey("thread.id"), nullable=False)
+    timestamp = Column(DateTime, nullable=False)
     comment = Column(String)
     email = Column(String)
-    file = Column(String, nullable=True)
+    file = Column(String)
 
-    def __init__(self, threadid, author, comment, email, file):
-        self.threadid = threadid
+    thread = relationship(Thread, backref="posts", single_parent=True,
+        cascade="all, delete, delete-orphan")
+
+    def __init__(self, author, comment, email, file):
         self.comment = comment
         self.author = author
         self.email = email

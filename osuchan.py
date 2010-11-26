@@ -77,18 +77,15 @@ def comment(board):
 
     session = sm()
 
-    # Insert thread entry
+    # Create thread and first post, inserting them together.
     thread = models.Thread(board, request.POST["subject"],
         request.POST["name"])
-    session.add(thread)
-    session.commit()
+    post = models.Post(request.POST["comment"], request.POST["name"],
+        request.POST["email"], filename)
 
-    threadid = thread.id
-    
-    # Insert first post
-    post = models.Post(threadid, request.POST["comment"],
-        request.POST["name"], request.POST["email"], filename)
-    session.add(post)
+    thread.posts = [post]
+
+    session.add(thread)
     session.commit()
     
     return "<html><head><meta http-equiv='refresh' content='3;url=http://ponderosa.osuosl.org:1337/%s'></head><body>Message Posted!  Please wait 3 seconds to be redirected back to the board index.</body></html>" % board
@@ -110,8 +107,10 @@ def threadcomment(board, thread):
 
     session = sm()
 
-    post = models.Post(thread, request.POST["name"], request.POST["comment"],
+    post = models.Post(request.POST["name"], request.POST["comment"],
         request.POST["email"], filename)
+    post.threadid = thread
+
     session.add(post)
     session.commit()
 
