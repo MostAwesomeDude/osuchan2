@@ -41,14 +41,15 @@ def comment(board):
         return "You forgot to fill in a comment!"
     if not request.POST['email']:
         return "You forgot to provide an email address"
+    if "datafile" not in request.POST:
+        return "You forgot to select a file to upload"
 
-    datafile = request.POST.get('datafile')
-    hash = hashlib.md5()
-    hash.update(datafile.file.read())
+    datafile = request.POST['datafile']
+    hash = hashlib.md5(datafile.file.read())
     md5sum = hash.hexdigest()
     datafile.file.seek(0)
 
-    fh = open('/home/bkero/cs440/static/images/%s' % md5sum, 'w')
+    fh = open('static/images/%s' % md5sum, 'w')
     fh.write(datafile.file.read())
     fh.close()
 
@@ -60,7 +61,7 @@ def comment(board):
     session.add(thread)
     session.commit()
 
-    threadid = thread.threadid
+    threadid = thread.id
     
     # Insert first post
     post = models.Post(threadid, request.POST["comment"],
