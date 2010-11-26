@@ -54,7 +54,7 @@ class Post(Base):
     email = Column(String)
     file = Column(String, nullable=True)
 
-    def __init__(self, threadid, comment, author, email, file):
+    def __init__(self, threadid, author, comment, email, file):
         self.threadid = threadid
         self.comment = comment
         self.author = author
