@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from bottle import request, route, run, template, view
+from bottle import request, route, run, view
 import bottle
 bottle.debug(True)
 import hashlib
