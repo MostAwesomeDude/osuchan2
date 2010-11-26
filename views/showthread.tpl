@@ -16,14 +16,16 @@
         </form>
     </section>
     <section id="threads">
-        %for (id, author, threadid, timestamp, comment, email, file) in posts:
+        %for post in posts:
         <article>
             <header>
-                {{author}} <time>{{timestamp}}</time> No. {{id}} <br />
+                {{post.author}} <time>{{post.timestamp}}</time> No. {{post.id}} <br />
             </header>
             <section>
-                <img src="/static/images/{{file}}" />
-                {{comment}}
+                %if post.file:
+                <img src="/static/images/{{post.file}}" />
+                %end
+                {{post.comment}}
             </section>
         </article>
         <br />

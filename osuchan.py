@@ -105,6 +105,8 @@ def threadcomment(board, thread):
 
     if "datafile" in request.POST:
         filename = save_file(request.POST["datafile"])
+    else:
+        filename = ""
 
     session = sm()
 
@@ -120,10 +122,8 @@ def threadcomment(board, thread):
 def showboard(board):
     session = sm()
 
-    threads = []
-    query = session.query(models.Thread)
-    for thread in query.filter(models.Thread.board==board):
-        threads.append((thread.id, thread.subject, thread.author))
+    query = session.query(models.Thread).filter(models.Thread.board==board)
+    threads = query.all()
 
     return dict(title=board, board=board, threads=threads)
 
@@ -137,10 +137,7 @@ def showthread(board, thread):
 
     query = session.query(models.Post).filter(models.Post.threadid==thread)
     query = query.order_by(models.Post.timestamp)
-    posts = []
-    for post in query:
-        posts.append((post.id, post.author, post.threadid, post.timestamp,
-            post.comment, post.email, post.file))
+    posts = query.all()
 
     return dict(title=subject, board=board, posts=posts, thread=thread)
 

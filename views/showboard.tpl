@@ -19,9 +19,10 @@
 
 
     <section>
-        %for (id, subject, author) in threads:
+        %for thread in threads:
         <article>
-            {{author}} - {{subject}}  [<a href="{{board}}/{{id}}">Reply</a>] <br />
+            {{thread.author}} - {{thread.subject}}  [<a
+            href="{{board}}/{{thread.id}}">Reply</a>] <br />
         </article>
         %end
     </section>
