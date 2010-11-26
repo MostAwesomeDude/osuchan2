@@ -52,12 +52,14 @@ class Post(Base):
     timestamp = Column(DateTime)
     comment = Column(String)
     email = Column(String)
+    file = Column(String, nullable=True)
 
-    def __init__(self, threadid, comment, author, email):
+    def __init__(self, threadid, comment, author, email, file):
         self.threadid = threadid
         self.comment = comment
         self.author = author
         self.email = email
+        self.file = file
 
         self.timestamp = datetime.datetime.now()
 

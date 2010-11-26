@@ -65,7 +65,7 @@ def comment(board):
     
     # Insert first post
     post = models.Post(threadid, request.POST["comment"],
-        request.POST["name"], request.POST["email"])
+        request.POST["name"], request.POST["email"], md5sum)
     session.add(post)
     session.commit()
     
@@ -87,14 +87,14 @@ def threadcomment(board, thread):
     md5sum = hash.hexdigest()
     datafile.file.seek(0)
 
-    fh = open('/home/bkero/cs440/static/images/%s' % md5sum, 'w')
+    fh = open('static/images/%s' % md5sum, 'w')
     fh.write(datafile.file.read())
     fh.close()
 
     session = sm()
 
     post = models.Post(thread, request.POST["name"], request.POST["comment"],
-    request.POST["email"], md5sum)
+        request.POST["email"], md5sum)
     session.add(post)
     session.commit()
 
@@ -125,7 +125,7 @@ def showthread(board, thread):
     posts = []
     for post in query:
         posts.append((post.id, post.author, post.threadid, post.timestamp,
-        post.comment, post.email, post.file))
+            post.comment, post.email, post.file))
 
     return dict(title=subject, board=board, posts=posts, thread=thread)
 
