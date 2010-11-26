@@ -14,6 +14,24 @@ from sqlalchemy.orm import sessionmaker
 engine = create_engine("sqlite:///test.db")
 sm = sessionmaker(bind=engine)
 
+def save_file(f):
+    """
+    Save the given file resource to disk.
+
+    Returns the filename on disk.
+    """
+
+    datafile = request.POST['datafile']
+    hash = hashlib.md5(datafile.file.read())
+    md5sum = hash.hexdigest()
+    datafile.file.seek(0)
+
+    fh = open('static/images/%s' % md5sum, 'w')
+    fh.write(datafile.file.read())
+    fh.close()
+
+    return md5sum
+
 @route('/')
 @view('index')
 def index():
@@ -43,14 +61,7 @@ def comment(board):
     if "datafile" not in request.POST:
         return "You forgot to select a file to upload"
 
-    datafile = request.POST['datafile']
-    hash = hashlib.md5(datafile.file.read())
-    md5sum = hash.hexdigest()
-    datafile.file.seek(0)
-
-    fh = open('static/images/%s' % md5sum, 'w')
-    fh.write(datafile.file.read())
-    fh.close()
+    filename = save_file(request.POST["datafile"])
 
     session = sm()
 
@@ -64,7 +75,7 @@ def comment(board):
     
     # Insert first post
     post = models.Post(threadid, request.POST["comment"],
-        request.POST["name"], request.POST["email"], md5sum)
+        request.POST["name"], request.POST["email"], filename)
     session.add(post)
     session.commit()
     
@@ -80,20 +91,13 @@ def threadcomment(board, thread):
     if not request.POST['email']:
         return "You forgot to provide an email address"
 
-    datafile = request.POST.get('datafile')
-    hash = hashlib.md5()
-    hash.update(datafile.file.read())
-    md5sum = hash.hexdigest()
-    datafile.file.seek(0)
-
-    fh = open('static/images/%s' % md5sum, 'w')
-    fh.write(datafile.file.read())
-    fh.close()
+    if "datafile" in request.POST:
+        filename = save_file(request.POST["datafile"])
 
     session = sm()
 
     post = models.Post(thread, request.POST["name"], request.POST["comment"],
-        request.POST["email"], md5sum)
+        request.POST["email"], filename)
     session.add(post)
     session.commit()
 
