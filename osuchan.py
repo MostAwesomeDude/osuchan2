@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 
-from bottle import request, route, run, view
-import bottle
-bottle.debug(True)
 import hashlib
+import mimetypes
 
-header="OSUChan"
+import magic
+
+cookie = magic.open(magic.MAGIC_MIME)
+cookie.load()
+
+from bottle import debug, request, route, run, send_file, view
+debug(True)
 
 import models
 from sqlalchemy import create_engine
@@ -14,6 +18,8 @@ from sqlalchemy.orm import sessionmaker
 engine = create_engine("sqlite:///test.db")
 sm = sessionmaker(bind=engine)
 
+header="OSUChan"
+
 def save_file(f):
     """
     Save the given file resource to disk.
@@ -21,16 +27,22 @@ def save_file(f):
     Returns the filename on disk.
     """
 
-    datafile = request.POST['datafile']
-    hash = hashlib.md5(datafile.file.read())
-    md5sum = hash.hexdigest()
-    datafile.file.seek(0)
+    hash = hashlib.md5(f.file.read())
+    f.file.seek(0)
 
-    fh = open('static/images/%s' % md5sum, 'w')
-    fh.write(datafile.file.read())
+    md5sum = hash.hexdigest()
+
+    mime = cookie.buffer(f.file.read())
+    f.file.seek(0)
+
+    extension = mimetypes.guess_extension(mime.split(";")[0])
+
+    filename = "%s%s" % (md5sum, extension)
+    fh = open("static/images/%s" % filename, 'wb')
+    fh.write(f.file.read())
     fh.close()
 
-    return md5sum
+    return filename
 
 @route('/')
 @view('index')
@@ -41,11 +53,11 @@ def index():
 
 @route('/static/:name')
 def style(name):
-    bottle.send_file(name,root='static')
+    send_file(name,root='static')
 
 @route('/static/images/:image')
 def sendimage(image):
-    bottle.send_file(image,root='static/images')
+    send_file(image,root='static/images')
 
 @route('/:board/comment', method='POST')
 def comment(board):
