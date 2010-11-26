@@ -80,7 +80,7 @@ def comment(board):
     # Create thread and first post, inserting them together.
     thread = models.Thread(board, request.POST["subject"],
         request.POST["name"])
-    post = models.Post(request.POST["comment"], request.POST["name"],
+    post = models.Post(request.POST["name"], request.POST["comment"],
         request.POST["email"], filename)
 
     thread.posts = [post]
