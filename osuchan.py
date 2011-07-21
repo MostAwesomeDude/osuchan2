@@ -58,26 +58,26 @@ def index():
 @app.route('/<board>/comment', methods=('POST',))
 def comment(board):
 
-    if not request.POST['subject']:
+    if not request.form['subject']:
         return "You forgot to fill out the subject"
-    if not request.POST['name']:
+    if not request.form['name']:
         return "You forgot to fill our your name"
-    if not request.POST['comment']:
+    if not request.form['comment']:
         return "You forgot to fill in a comment!"
-    if not request.POST['email']:
+    if not request.form['email']:
         return "You forgot to provide an email address"
-    if "datafile" not in request.POST:
+    if "datafile" not in request.form:
         return "You forgot to select a file to upload"
 
-    filename = save_file(request.POST["datafile"])
+    filename = save_file(request.form["datafile"])
 
     session = sm()
 
     # Create thread and first post, inserting them together.
-    thread = models.Thread(board, request.POST["subject"],
-        request.POST["name"])
-    post = models.Post(request.POST["name"], request.POST["comment"],
-        request.POST["email"], filename)
+    thread = models.Thread(board, request.form["subject"],
+        request.form["name"])
+    post = models.Post(request.form["name"], request.form["comment"],
+        request.form["email"], filename)
 
     thread.posts = [post]
 
@@ -89,22 +89,22 @@ def comment(board):
 @app.route('/<board>/<thread>/comment', methods=('POST',))
 def threadcomment(board, thread):
 
-    if not request.POST['name']:
+    if not request.form['name']:
         return "You forgot to fill our your name"
-    if not request.POST['comment']:
+    if not request.form['comment']:
         return "You forgot to fill in a comment!"
-    if not request.POST['email']:
+    if not request.form['email']:
         return "You forgot to provide an email address"
 
-    if "datafile" in request.POST:
-        filename = save_file(request.POST["datafile"])
+    if "datafile" in request.form:
+        filename = save_file(request.form["datafile"])
     else:
         filename = ""
 
     session = sm()
 
-    post = models.Post(request.POST["name"], request.POST["comment"],
-        request.POST["email"], filename)
+    post = models.Post(request.form["name"], request.form["comment"],
+        request.form["email"], filename)
     post.threadid = thread
 
     session.add(post)
