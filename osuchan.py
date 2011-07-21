@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 
+if __name__ == "__main__":
+    from osuchan import app
+    app.run(debug=True, host="0.0.0.0", port=1337)
+
 import hashlib
 import mimetypes
 
 import magic
 
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
 cookie = magic.open(magic.MAGIC_MIME)
 cookie.load()
-
-from bottle import debug, request, route, run, send_file, view
-debug(True)
 
 import models
 from sqlalchemy import create_engine
@@ -44,22 +49,13 @@ def save_file(f):
 
     return filename
 
-@route('/')
-@view('index')
+@app.route('/')
 def index():
     session = sm()
     boards = [(b.name, b.abbreviation) for b in session.query(models.Board)]
-    return {"title": header, "boards": boards}
+    return render_template("index.tpl", title=header, boards=boards)
 
-@route('/static/:name')
-def style(name):
-    send_file(name,root='static')
-
-@route('/static/images/:image')
-def sendimage(image):
-    send_file(image,root='static/images')
-
-@route('/:board/comment', method='POST')
+@app.route('/<board>/comment', methods=('POST',))
 def comment(board):
 
     if not request.POST['subject']:
@@ -87,10 +83,10 @@ def comment(board):
 
     session.add(thread)
     session.commit()
-    
+
     return "<html><head><meta http-equiv='refresh' content='3;url=http://ponderosa.osuosl.org:1337/%s'></head><body>Message Posted!  Please wait 3 seconds to be redirected back to the board index.</body></html>" % board
 
-@route('/:board/:thread/comment', method='POST')
+@app.route('/<board>/<thread>/comment', methods=('POST',))
 def threadcomment(board, thread):
 
     if not request.POST['name']:
@@ -116,18 +112,17 @@ def threadcomment(board, thread):
 
     return "<html><head><meta http-equiv='refresh' content='3;url=http://ponderosa.osuosl.org:1337/%s/%s'></head><body>Message Posted!  Please wait 3 seconds to be redirected back to the thread.</body></html>" % (board, thread)
 
-@route('/:board')
-@view('showboard')
+@app.route('/<board>')
 def showboard(board):
     session = sm()
 
     query = session.query(models.Thread).filter(models.Thread.board==board)
     threads = query.all()
 
-    return dict(title=board, board=board, threads=threads)
+    return render_template("showboard.tpl", title=board, board=board,
+        threads=threads)
 
-@route('/:board/:thread')
-@view('showthread')
+@app.route('/<board>/<thread>')
 def showthread(board, thread):
     session = sm()
 
@@ -138,6 +133,5 @@ def showthread(board, thread):
     query = query.order_by(models.Post.timestamp)
     posts = query.all()
 
-    return dict(title=subject, board=board, posts=posts, thread=thread)
-
-run(host='0.0.0.0', port=1337)
+    return render_template("showthread.tpl", title=subject, board=board,
+        posts=posts, thread=thread)
