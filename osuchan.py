@@ -119,7 +119,7 @@ def showboard(board):
     query = session.query(models.Thread).filter(models.Thread.board==board)
     threads = query.all()
 
-    return render_template("showboard.tpl", title=board, board=board,
+    return render_template("showboard.html", title=board, board=board,
         threads=threads)
 
 @app.route('/<board>/<thread>')
