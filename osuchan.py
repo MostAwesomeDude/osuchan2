@@ -116,7 +116,7 @@ def threadcomment(board, thread):
 def showboard(board):
     session = sm()
 
-    query = session.query(models.Thread).filter(models.Thread.board==board)
+    query = session.query(models.Thread).filter_by(board=board)
     threads = query.all()
 
     return render_template("showboard.html", title=board, board=board,
@@ -126,10 +126,10 @@ def showboard(board):
 def showthread(board, thread):
     session = sm()
 
-    query = session.query(models.Thread).filter(models.Thread.id==thread)
+    query = session.query(models.Thread).filter_by(id=thread)
     subject = query.one().subject
 
-    query = session.query(models.Post).filter(models.Post.threadid==thread)
+    query = session.query(models.Post).filter_by(threadid=thread)
     query = query.order_by(models.Post.timestamp)
     posts = query.all()
 
