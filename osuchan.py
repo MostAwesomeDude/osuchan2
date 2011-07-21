@@ -57,6 +57,7 @@ def index():
 
 @app.route('/<board>/comment', methods=('POST',))
 def comment(board):
+    email = request.form["email"]
 
     if not request.form['subject']:
         return "You forgot to fill out the subject"
@@ -64,7 +65,7 @@ def comment(board):
         return "You forgot to fill our your name"
     if not request.form['comment']:
         return "You forgot to fill in a comment!"
-    if not request.form['email']:
+    if not email:
         return "You forgot to provide an email address"
     if "datafile" not in request.form:
         return "You forgot to select a file to upload"
@@ -84,17 +85,22 @@ def comment(board):
     session.add(thread)
     session.commit()
 
-    return render_template("redirect.html",
-        url=url_for("showboard", board=board))
+    if email == "noko":
+        url = url_for("showthread", board=board, thread=thread.id)
+    else:
+        url = url_for("showboard", board=board)
+
+    return render_template("redirect.html", url=url)
 
 @app.route('/<board>/<thread>/comment', methods=('POST',))
 def threadcomment(board, thread):
+    email = request.form["email"]
 
     if not request.form['name']:
         return "You forgot to fill our your name"
     if not request.form['comment']:
         return "You forgot to fill in a comment!"
-    if not request.form['email']:
+    if not email:
         return "You forgot to provide an email address"
 
     if "datafile" in request.form:
@@ -111,8 +117,12 @@ def threadcomment(board, thread):
     session.add(post)
     session.commit()
 
-    return render_template("redirect.html",
-        url=url_for("showthread", board=board, thread=thread))
+    if email == "noko":
+        url = url_for("showthread", board=board, thread=thread)
+    else:
+        url = url_for("showboard", board=board)
+
+    return render_template("redirect.html", url=url)
 
 @app.route('/<board>')
 def showboard(board):
