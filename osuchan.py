@@ -53,7 +53,7 @@ def save_file(f):
 def index():
     session = sm()
     boards = [(b.name, b.abbreviation) for b in session.query(models.Board)]
-    return render_template("index.tpl", title=header, boards=boards)
+    return render_template("index.html", title=header, boards=boards)
 
 @app.route('/<board>/comment', methods=('POST',))
 def comment(board):
