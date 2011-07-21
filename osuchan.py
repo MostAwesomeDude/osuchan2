@@ -32,20 +32,15 @@ def save_file(f):
     Returns the filename on disk.
     """
 
-    hash = hashlib.md5(f.file.read())
-    f.file.seek(0)
+    hash = hashlib.md5(f.stream.read())
+    f.stream.seek(0)
 
     md5sum = hash.hexdigest()
 
-    mime = cookie.buffer(f.file.read())
-    f.file.seek(0)
-
-    extension = mimetypes.guess_extension(mime.split(";")[0])
+    extension = mimetypes.guess_extension(f.mimetype)
 
     filename = "%s%s" % (md5sum, extension)
-    fh = open("static/images/%s" % filename, 'wb')
-    fh.write(f.file.read())
-    fh.close()
+    f.save("static/images/%s" % filename)
 
     return filename
 
@@ -67,10 +62,10 @@ def comment(board):
         return "You forgot to fill in a comment!"
     if not email:
         return "You forgot to provide an email address"
-    if "datafile" not in request.form:
+    if "datafile" not in request.files:
         return "You forgot to select a file to upload"
 
-    filename = save_file(request.form["datafile"])
+    filename = save_file(request.files["datafile"])
 
     session = sm()
 
@@ -103,8 +98,8 @@ def threadcomment(board, thread):
     if not email:
         return "You forgot to provide an email address"
 
-    if "datafile" in request.form:
-        filename = save_file(request.form["datafile"])
+    if "datafile" in request.file:
+        filename = save_file(request.file["datafile"])
     else:
         filename = ""
 
