@@ -133,5 +133,5 @@ def showthread(board, thread):
     query = query.order_by(models.Post.timestamp)
     posts = query.all()
 
-    return render_template("showthread.tpl", title=subject, board=board,
+    return render_template("showthread.html", title=subject, board=board,
         posts=posts, thread=thread)
