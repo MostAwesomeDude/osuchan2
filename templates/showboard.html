@@ -1,10 +1,10 @@
-<!doctype html>
-<head>
-    <title>/{{ title }}/ - OSUchan</title>
-    <link rel='stylesheet' type="text/css" href='/static/style.css' />
-</head>
-<body>
-    <header>OSUChan</header>
+{% extends "base.html" %}
+
+{% block title %}
+    /{{ title }}/
+{% endblock %}
+
+{% block body %}
     <section id="compose">
         <form name="formcompose" action='/{{ board }}/comment' method='post' enctype="multipart/form-data">
             <label for="name">Name</label><input type='text' name='name' value='Anonymous'/><br />
@@ -17,17 +17,12 @@
         </form>
     </section>
 
-
     <section>
         {% for thread in threads: %}
         <article>
-            {{ thread.author }} - {{ thread.subject }}  [<a
-            href="{{ board }}/{{ thread.id }}">Reply</a>] <br />
+            {{ thread.author }} - {{ thread.subject }}
+            [<a href="{{ board }}/{{ thread.id }}">Reply</a>] <br />
         </article>
         {% endfor %}
     </section>
-
-
-    <footer>OSUChan</footer>
-    </body>
-</html>
+{% endblock %}
