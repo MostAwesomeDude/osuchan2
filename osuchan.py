@@ -9,7 +9,7 @@ import mimetypes
 
 import magic
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 
 app = Flask(__name__)
 
@@ -84,7 +84,8 @@ def comment(board):
     session.add(thread)
     session.commit()
 
-    return "<html><head><meta http-equiv='refresh' content='3;url=http://ponderosa.osuosl.org:1337/%s'></head><body>Message Posted!  Please wait 3 seconds to be redirected back to the board index.</body></html>" % board
+    return render_template("redirect.html",
+        url=url_for("showboard", board=board))
 
 @app.route('/<board>/<thread>/comment', methods=('POST',))
 def threadcomment(board, thread):
@@ -110,7 +111,8 @@ def threadcomment(board, thread):
     session.add(post)
     session.commit()
 
-    return "<html><head><meta http-equiv='refresh' content='3;url=http://ponderosa.osuosl.org:1337/%s/%s'></head><body>Message Posted!  Please wait 3 seconds to be redirected back to the thread.</body></html>" % (board, thread)
+    return render_template("redirect.html",
+        url=url_for("showthread", board=board, thread=thread))
 
 @app.route('/<board>')
 def showboard(board):
