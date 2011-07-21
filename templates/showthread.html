@@ -22,9 +22,9 @@
                 {{ post.author }} <time>{{ post.timestamp }}</time> No. {{ post.id }} <br />
             </header>
             <section>
-                %if post.file:
+                {% if post.file %}
                 <img src="/static/images/{{ post.file }}" />
-                %end
+                {% endif %}
                 {{ post.comment }}
             </section>
         </article>
