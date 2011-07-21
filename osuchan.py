@@ -119,7 +119,7 @@ def threadcomment(board, thread):
 
     return render_template("redirect.html", url=url)
 
-@app.route('/<board>')
+@app.route('/<board>/')
 def showboard(board):
     session = sm()
 
