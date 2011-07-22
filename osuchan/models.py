@@ -74,7 +74,7 @@ if __name__ == "__main__":
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
 
-    engine = create_engine("sqlite:///test.db")
+    engine = create_engine("sqlite:///temp.db")
     db.Model.metadata.create_all(engine)
     session = sessionmaker(bind=engine)()
 
