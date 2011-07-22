@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 if __name__ == "__main__":
-    from osuchan import app
+    from main import app
     app.run(debug=True, host="0.0.0.0", port=1337)
 
 import hashlib
@@ -11,7 +11,10 @@ import magic
 
 from flask import Flask, render_template, request, url_for
 
+from osuchan.blueprint import osuchan
+
 app = Flask(__name__)
+app.register_blueprint(osuchan)
 
 cookie = magic.open(magic.MAGIC_MIME)
 cookie.load()
