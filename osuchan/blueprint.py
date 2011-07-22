@@ -32,7 +32,7 @@ def save_file(f):
 
 @osuchan.route('/')
 def index():
-    boards = [(b.name, b.abbreviation) for b in db.session.query(Board)]
+    boards = [(b.name, b.abbreviation) for b in Board.query.all()]
     return render_template("index.html", title=header, boards=boards)
 
 @osuchan.route('/<board>/comment', methods=('POST',))
@@ -102,19 +102,16 @@ def threadcomment(board, thread):
 
 @osuchan.route('/<board>/')
 def showboard(board):
-    query = db.session.query(Thread).filter_by(board=board)
-    threads = query.all()
+    threads = Thread.query.filter_by(board=board).all()
 
     return render_template("showboard.html", title=board, board=board,
         threads=threads)
 
 @osuchan.route('/<board>/<int:thread>')
 def showthread(board, thread):
-    query = db.session.query(Thread).filter_by(id=thread)
-    subject = query.one().subject
+    subject = Thread.query.filter_by(id=thread).one().subject
 
-    query = db.session.query(Post).filter_by(threadid=thread)
-    query = query.order_by(Post.timestamp)
+    query = Post.query.filter_by(threadid=thread).order_by(Post.timestamp)
     posts = query.all()
 
     return render_template("showthread.html", title=subject, board=board,
