@@ -70,7 +70,7 @@ def comment(board):
 
     return render_template("redirect.html", url=url)
 
-@osuchan.route('/<board>/<thread>/comment', methods=('POST',))
+@osuchan.route('/<board>/<int:thread>/comment', methods=('POST',))
 def threadcomment(board, thread):
     email = request.form["email"]
 
@@ -108,7 +108,7 @@ def showboard(board):
     return render_template("showboard.html", title=board, board=board,
         threads=threads)
 
-@osuchan.route('/<board>/<thread>')
+@osuchan.route('/<board>/<int:thread>')
 def showthread(board, thread):
     query = db.session.query(Thread).filter_by(id=thread)
     subject = query.one().subject
