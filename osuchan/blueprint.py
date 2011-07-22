@@ -6,7 +6,8 @@ from flask import Blueprint, render_template, request, url_for
 
 from osuchan.models import db, Board, Post, Thread
 
-osuchan = Blueprint("osuchan", __name__, template_folder="templates")
+osuchan = Blueprint("osuchan", __name__, static_folder="static",
+    template_folder="templates")
 
 header = "OSUChan"
 
