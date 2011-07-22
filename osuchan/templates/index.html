@@ -7,7 +7,7 @@
         <table>
         {% for (boardname, abbreviation) in boards %}
             <tr>
-                <td><a href="/{{ abbreviation }}">{{ boardname }}</a></td>
+                <td><a href="{{ url_for("osuchan.showboard", board=abbreviation) }}">{{ boardname }}</a></td>
             </tr>
         {% endfor %}
         </table>
