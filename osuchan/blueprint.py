@@ -23,7 +23,7 @@ def save_file(f):
 
     md5sum = hash.hexdigest()
 
-    extension = mimetypes.guess_extension(f.mimetype)
+    extension = mimetypes.guess_extension(f.content_type)
 
     filename = "%s%s" % (md5sum, extension)
     f.save("static/images/%s" % filename)
@@ -64,9 +64,9 @@ def comment(board):
     db.session.commit()
 
     if email == "noko":
-        url = url_for("showthread", board=board, thread=thread.id)
+        url = url_for("osuchan.showthread", board=board, thread=thread.id)
     else:
-        url = url_for("showboard", board=board)
+        url = url_for("osuchan.showboard", board=board)
 
     return render_template("redirect.html", url=url)
 
@@ -94,9 +94,9 @@ def threadcomment(board, thread):
     db.session.commit()
 
     if email == "noko":
-        url = url_for("showthread", board=board, thread=thread)
+        url = url_for("osuchan.showthread", board=board, thread=thread)
     else:
-        url = url_for("showboard", board=board)
+        url = url_for("osuchan.showboard", board=board)
 
     return render_template("redirect.html", url=url)
 
