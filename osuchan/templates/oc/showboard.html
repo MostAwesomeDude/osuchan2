@@ -23,7 +23,7 @@
         {% for thread in threads %}
         <article>
             {{ thread.author }} - {{ thread.subject }}
-            [<a href="{{ url_for("osuchan.showthread", board=board, thread=thread.id) }}">Reply</a>] <br />
+            [<a href="{{ url_for("osuchan.showthread", board=board, tid=thread.id) }}">Reply</a>] <br />
         </article>
         {% endfor %}
     </section>

@@ -18,6 +18,10 @@ def save_file(f):
     Returns the filename on disk.
     """
 
+    # Empty file?
+    if not f.content_length:
+        return ""
+
     hash = hashlib.md5(f.stream.read())
     f.stream.seek(0)
 
@@ -64,7 +68,7 @@ def comment(board):
     db.session.commit()
 
     if email == "noko":
-        url = url_for("osuchan.showthread", board=board, thread=thread.id)
+        url = url_for("osuchan.showthread", board=board, tid=thread)
     else:
         url = url_for("osuchan.showboard", board=board)
 
@@ -81,8 +85,8 @@ def threadcomment(board, thread):
     if not email:
         return "You forgot to provide an email address"
 
-    if "datafile" in request.file:
-        filename = save_file(request.file["datafile"])
+    if "datafile" in request.files:
+        filename = save_file(request.files["datafile"])
     else:
         filename = ""
 
@@ -94,7 +98,7 @@ def threadcomment(board, thread):
     db.session.commit()
 
     if email == "noko":
-        url = url_for("osuchan.showthread", board=board, thread=thread)
+        url = url_for("osuchan.showthread", board=board, tid=thread)
     else:
         url = url_for("osuchan.showboard", board=board)
 
@@ -107,11 +111,12 @@ def showboard(board):
     return render_template("oc/showboard.html", title=board, board=board,
         threads=threads)
 
-@osuchan.route('/<board>/<int:thread>')
-def showthread(board, thread):
-    subject = Thread.query.filter_by(id=thread).one().subject
+@osuchan.route('/<board>/<int:tid>')
+def showthread(board, tid):
+    thread = Thread.query.filter_by(id=tid).one()
+    subject = thread.subject
 
-    query = Post.query.filter_by(threadid=thread).order_by(Post.timestamp)
+    query = Post.query.filter_by(threadid=tid).order_by(Post.timestamp)
     posts = query.all()
 
     return render_template("oc/showthread.html", title=subject, board=board,
