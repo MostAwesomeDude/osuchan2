@@ -68,7 +68,10 @@ def comment(board):
     db.session.commit()
 
     if email == "noko":
-        url = url_for("osuchan.showthread", board=board, tid=thread)
+        if request.referrer:
+            url = request.referrer
+        else:
+            url = url_for("osuchan.showthread", board=board, tid=thread)
     else:
         url = url_for("osuchan.showboard", board=board)
 
@@ -98,7 +101,10 @@ def threadcomment(board, thread):
     db.session.commit()
 
     if email == "noko":
-        url = url_for("osuchan.showthread", board=board, tid=thread)
+        if request.referrer:
+            url = request.referrer
+        else:
+            url = url_for("osuchan.showthread", board=board, tid=thread)
     else:
         url = url_for("osuchan.showboard", board=board)
 
