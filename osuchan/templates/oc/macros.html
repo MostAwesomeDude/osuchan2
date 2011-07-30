@@ -1,0 +1,32 @@
+{% macro render_posts(thread) %}
+    <section id="compose">
+        <form name="formcompose"
+            action='{{ url_for("osuchan.threadcomment", board=thread.board,
+            thread=thread.id) }}'
+            method='post' enctype="multipart/form-data">
+            <label for='name'>Name</label><input type='text' name='name' value="Anonymous" /><br />
+            <label for='email'>Email</label><input type='text' name='email' /><br />
+            <label for='comment'>Comment</label><textarea name='comment' wrap='soft' rows=4 cols=48></textarea><br />
+            <label for='datafile'>File</label><input type='file' name='datafile' /><br />
+            <input type='hidden' name='board' value='{{ thread.board }}'>
+            <input type='submit' value='Submit' /><br />
+        </form>
+    </section>
+
+    <section id="threads">
+        {% for post in thread.posts %}
+        <article>
+            <header>
+                {{ post.author }} <time>{{ post.timestamp }}</time> No. {{ post.id }} <br />
+            </header>
+            <section>
+                {% if post.file %}
+                    <img src="/static/images/{{ post.file }}" />
+                {% endif %}
+                {{ post.comment }}
+            </section>
+        </article>
+        <br />
+        {% endfor %}
+    </section>
+{% endmacro %}
