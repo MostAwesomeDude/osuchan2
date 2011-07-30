@@ -1,10 +1,10 @@
-{% extends "base.html" %}
+{% extends "oc/base.html" %}
 
 {% block title %}
     {{ title }} - /{{ board }}/
 {% endblock %}
 
-{% block body %}
+{% macro render_posts() %}
     <section id="compose">
         <form name="formcompose"
             action='{{ url_for("osuchan.threadcomment", board=board, thread=thread) }}'
@@ -34,4 +34,8 @@
         <br />
         {% endfor %}
     </section>
+{% endmacro %}
+
+{% block body %}
+    {{ render_posts() }}
 {% endblock %}
