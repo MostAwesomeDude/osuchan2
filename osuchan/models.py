@@ -46,7 +46,7 @@ class Post(db.Model):
     author = db.Column(db.Unicode(30), nullable=False)
     threadid = db.Column(db.Integer, db.ForeignKey(Thread.id), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
-    comment = db.Column(db.UnicodeText)
+    comment = db.Column(db.UnicodeText(1024*1024))
     email = db.Column(db.String(30))
     file = db.Column(db.String(50))
 
