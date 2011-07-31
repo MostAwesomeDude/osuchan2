@@ -8,20 +8,20 @@ class Wordfilter(db.Model):
     __tablename__ = "badwords"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    replacement = db.Column(db.String)
+    name = db.Column(db.Unicode(30))
+    replacement = db.Column(db.Unicode(30))
 
 class Category(db.Model):
     __tablename__ = "boardcategory"
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
+    title = db.Column(db.Unicode(30))
 
 class Board(db.Model):
     __tablename__ = "board"
 
-    name = db.Column(db.String)
-    abbreviation = db.Column(db.String, primary_key=True)
+    name = db.Column(db.Unicode(30))
+    abbreviation = db.Column(db.String(5), primary_key=True)
     category = db.Column(db.Integer, db.ForeignKey("boardcategory.id"))
 
     def __init__(self, abbreviation, name):
@@ -32,9 +32,9 @@ class Thread(db.Model):
     __tablename__ = "thread"
 
     id = db.Column(db.Integer, primary_key=True)
-    subject = db.Column(db.String)
-    author = db.Column(db.String)
-    board = db.Column(db.String, db.ForeignKey("board.abbreviation"))
+    subject = db.Column(db.Unicode(50))
+    author = db.Column(db.Unicode(30))
+    board = db.Column(db.String(5), db.ForeignKey("board.abbreviation"))
 
     def __init__(self, board, subject, author):
         self.board = board
@@ -45,12 +45,12 @@ class Post(db.Model):
     __tablename__ = "post"
 
     id = db.Column(db.Integer, primary_key=True)
-    author = db.Column(db.String, nullable=False)
+    author = db.Column(db.Unicode(30), nullable=False)
     threadid = db.Column(db.Integer, db.ForeignKey("thread.id"), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
-    comment = db.Column(db.String)
-    email = db.Column(db.String)
-    file = db.Column(db.String)
+    comment = db.Column(db.UnicodeText)
+    email = db.Column(db.String(30))
+    file = db.Column(db.String(50))
 
     thread = db.relationship(Thread, backref="posts", single_parent=True,
         cascade="all, delete, delete-orphan")
@@ -68,7 +68,7 @@ class File(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     postid = db.Column(db.Integer, db.ForeignKey("post.id"))
-    filename = db.Column(db.String, nullable=False)
+    filename = db.Column(db.String(50), nullable=False)
 
 if __name__ == "__main__":
     from sqlalchemy import create_engine
