@@ -7,22 +7,20 @@ db = SQLAlchemy()
 class Wordfilter(db.Model):
     __tablename__ = "badwords"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode(30))
+    name = db.Column(db.Unicode(30), primary_key=True)
     replacement = db.Column(db.Unicode(30))
 
 class Category(db.Model):
     __tablename__ = "boardcategory"
 
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Unicode(30))
+    title = db.Column(db.Unicode(30), primary_key=True)
 
 class Board(db.Model):
     __tablename__ = "board"
 
     name = db.Column(db.Unicode(30))
     abbreviation = db.Column(db.String(5), primary_key=True)
-    category = db.Column(db.Integer, db.ForeignKey("boardcategory.id"))
+    category = db.Column(db.Unicode(30), db.ForeignKey(Category.title))
 
     def __init__(self, abbreviation, name):
         self.abbreviation = abbreviation
@@ -34,7 +32,7 @@ class Thread(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.Unicode(50))
     author = db.Column(db.Unicode(30))
-    board = db.Column(db.String(5), db.ForeignKey("board.abbreviation"))
+    board = db.Column(db.String(5), db.ForeignKey(Board.abbreviation))
 
     def __init__(self, board, subject, author):
         self.board = board
@@ -46,7 +44,7 @@ class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.Unicode(30), nullable=False)
-    threadid = db.Column(db.Integer, db.ForeignKey("thread.id"), nullable=False)
+    threadid = db.Column(db.Integer, db.ForeignKey(Thread.id), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     comment = db.Column(db.UnicodeText)
     email = db.Column(db.String(30))
@@ -66,9 +64,8 @@ class Post(db.Model):
 class File(db.Model):
     __tablename__ = "file"
 
-    id = db.Column(db.Integer, primary_key=True)
-    postid = db.Column(db.Integer, db.ForeignKey("post.id"))
-    filename = db.Column(db.String(50), nullable=False)
+    postid = db.Column(db.Integer, db.ForeignKey(Post.id))
+    filename = db.Column(db.String(50), primary_key=True)
 
 if __name__ == "__main__":
     from sqlalchemy import create_engine
