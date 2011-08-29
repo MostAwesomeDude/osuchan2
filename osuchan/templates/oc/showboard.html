@@ -1,23 +1,12 @@
 {% extends "oc/base.html" %}
+{% import "oc/macros.html" as macros %}
 
 {% block title %}
     /{{ title }}/
 {% endblock %}
 
 {% block body %}
-    <section id="compose">
-        <form name="formcompose"
-            action='{{ url_for("osuchan.comment", board=board) }}'
-            method='post' enctype="multipart/form-data">
-            <label for="name">Name</label><input type='text' name='name' value='Anonymous'/><br />
-            <label for="email">Email</label><input type='text' name='email' /><br />
-            <label for="subject">Subject</label><input type='text' name='subject' /><br />
-            <label for="comment">Comment</label><textarea rows=4 cols=48 name='comment'></textarea><br />
-            <label for='datafile'>Image</label><input type='file' name='datafile' /><br />
-            <input type='hidden' id='board' value='{{ title }}'>
-            <input type='submit' value='Submit' /><br />
-        </form>
-    </section>
+    {{ macros.render_form(url_for("osuchan.comment", board=board), title) }}
 
     <section>
         {% for thread in threads %}
