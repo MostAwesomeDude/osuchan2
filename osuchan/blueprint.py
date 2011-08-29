@@ -4,6 +4,7 @@ import mimetypes
 
 from flask import Blueprint, render_template, request, url_for
 
+from osuchan.forms import ChanForm
 from osuchan.models import db, Board, Post, Thread
 
 osuchan = Blueprint("osuchan", __name__, static_folder="static",
@@ -112,13 +113,15 @@ def threadcomment(board, thread):
 
 @osuchan.route('/<board>/')
 def showboard(board):
+    form = ChanForm()
     threads = Thread.query.filter_by(board=board).all()
 
     return render_template("oc/showboard.html", title=board, board=board,
-        threads=threads)
+        threads=threads, form=form)
 
 @osuchan.route('/<board>/<int:tid>')
 def showthread(board, tid):
+    form = ChanForm()
     thread = Thread.query.filter_by(id=tid).one()
     subject = thread.subject
 
@@ -126,4 +129,4 @@ def showthread(board, tid):
     posts = query.all()
 
     return render_template("oc/showthread.html", title=subject, board=board,
-        posts=posts, thread=thread)
+        posts=posts, thread=thread, form=form)

@@ -6,7 +6,8 @@
 {% endblock %}
 
 {% block body %}
-    {{ macros.render_form(url_for("osuchan.comment", board=board), title) }}
+    {{ macros.render_form(form, url_for("osuchan.comment", board=board),
+        title) }}
 
     <section>
         {% for thread in threads %}
