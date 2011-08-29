@@ -16,5 +16,6 @@ wd = os.getcwd()
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///%s/test.db" % wd
 app.config["SQLALCHEMY_ECHO"] = True
+app.config["SECRET_KEY"] = os.urandom(16)
 db.init_app(app)
 app.register_blueprint(osuchan)
