@@ -42,31 +42,26 @@ def index():
 
 @osuchan.route('/<board>/comment', methods=('POST',))
 def comment(board):
-    email = request.form["email"]
+    form = ChanForm()
 
-    if not request.form['subject']:
-        return "You forgot to fill out the subject"
-    if not request.form['name']:
-        return "You forgot to fill our your name"
-    if not request.form['comment']:
-        return "You forgot to fill in a comment!"
-    if not email:
-        return "You forgot to provide an email address"
+    if not form.validate_on_submit():
+        return "Error"
+
     if "datafile" not in request.files:
         return "You forgot to select a file to upload"
 
     filename = save_file(request.files["datafile"])
 
     # Create thread and first post, inserting them together.
-    thread = Thread(board, request.form["subject"],
-        request.form["name"])
-    post = Post(request.form["name"], request.form["comment"],
-        request.form["email"], filename)
+    thread = Thread(board, form.subject.data, form.name.data)
+    post = Post(form.name.data, form.comment.data, form.email.data, filename)
 
     thread.posts = [post]
 
     db.session.add(thread)
     db.session.commit()
+
+    email = form.email.data
 
     if email == "noko":
         if request.referrer:
@@ -80,26 +75,23 @@ def comment(board):
 
 @osuchan.route('/<board>/<int:thread>/comment', methods=('POST',))
 def threadcomment(board, thread):
-    email = request.form["email"]
+    form = ChanForm()
 
-    if not request.form['name']:
-        return "You forgot to fill our your name"
-    if not request.form['comment']:
-        return "You forgot to fill in a comment!"
-    if not email:
-        return "You forgot to provide an email address"
+    if not form.validate_on_submit():
+        return "Error"
 
     if "datafile" in request.files:
         filename = save_file(request.files["datafile"])
     else:
         filename = ""
 
-    post = Post(request.form["name"], request.form["comment"],
-        request.form["email"], filename)
+    post = Post(form.name.data, form.comment.data, form.email.data, filename)
     post.threadid = thread
 
     db.session.add(post)
     db.session.commit()
+
+    email = form.email.data
 
     if email == "noko":
         if request.referrer:
