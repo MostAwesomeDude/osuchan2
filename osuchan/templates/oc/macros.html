@@ -1,21 +1,36 @@
+{% macro render_field(field) %}
+    {# Hack: Don't show SubmitField labels, since they merely repeat the
+     # content of the button. #}
+    {# Hack: Don't show HiddenField labels, and hide them with undisplayable
+     # divs. #}
+    {% set hide_label = field.type in ("HiddenField", "SubmitField") %}
+    {% if not hide_label %}
+        {{ field.label }}
+    {% endif %}
+    {# Hack: Textareas should have extra params for display. #}
+    {% if field.type == "TextAreaField" %}
+        {{ field(wrap="soft", rows="4", cols="48")|safe }}
+    {% else %}
+        {{ field()|safe }}
+    {% endif %}
+    {% if field.errors %}
+        <ul class="errors">
+        {% for error in field.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}
+
 {% macro render_form(form, url, board) %}
     <section id="compose">
-        <form name="formcompose" action="{{ url }}" method="post"
+        <form name="formcompose" action="{{ url }}" method="POST"
             enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
-            <label for="name">Name</label>
-            <input type="text" name="name" value="Anonymous" /><br />
-            <label for="email">Email</label>
-            <input type="text" name="email" /><br />
-            <label for="subject">Subject</label>
-            <input type="text" name="subject" /><br />
-            <label for="comment">Comment</label>
-            <textarea name="comment" wrap="soft" rows="4"
-            cols="48"></textarea><br />
-            <label for="datafile">Image</label>
-            <input type="file" name="datafile" /><br />
             <input type="hidden" name="board" value="{{ board }}" />
-            <input type="submit" value="Submit" /><br />
+            {% for field in form %}
+                {{ render_field(field) }}
+                <br />
+            {% endfor %}
         </form>
     </section>
 {% endmacro %}
