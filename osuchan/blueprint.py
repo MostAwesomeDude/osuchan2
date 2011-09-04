@@ -1,11 +1,8 @@
-
-import hashlib
-import mimetypes
-
 from flask import Blueprint, render_template, request, url_for
 
 from osuchan.forms import ChanForm
 from osuchan.models import db, Board, Post, Thread
+from osuchan.utilities import chan_filename
 
 osuchan = Blueprint("osuchan", __name__, static_folder="static",
     template_folder="templates")
@@ -23,14 +20,7 @@ def save_file(f):
     if not f.content_length:
         return ""
 
-    hash = hashlib.md5(f.stream.read())
-    f.stream.seek(0)
-
-    md5sum = hash.hexdigest()
-
-    extension = mimetypes.guess_extension(f.content_type)
-
-    filename = "%s%s" % (md5sum, extension)
+    filename = chan_filename(f)
     f.save("static/images/%s" % filename)
 
     return filename
