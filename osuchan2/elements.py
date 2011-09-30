@@ -1,6 +1,48 @@
 from twisted.web.template import Element, XMLString, renderer, tags
 
-from osuchan2.items import Post, Thread
+from osuchan2.items import Board, Post, Thread
+
+class IndexElement(Element):
+
+    loader = XMLString("""
+        <html xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1">
+            <head>
+                <title t:render="title" />
+                <link rel="stylesheet" type="text/css" href="#" />
+            </head>
+            <body>
+                <header t:render="title" />
+                <footer>(c) GPLv2</footer>
+            </body>
+        </html>
+    """)
+
+    def __init__(self, body):
+        self.body_element = body
+
+    @renderer
+    def title(self, request, tag):
+        return tag("OSUChan")
+
+    @renderer
+    def body(self, request, tag):
+        return tag(self.body_element)
+
+class BoardElement(Element):
+
+    loader = XMLString("""
+        <section
+            xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1"
+            t:render="boards" />
+    """)
+
+    def __init__(self, store):
+        self.store = store
+
+    @renderer
+    def boards(self, request, tag):
+        boards = self.store.query(Board)
+        return tag(*[BoardElement(board) for board in boards])
 
 class FullBoardElement(Element):
 

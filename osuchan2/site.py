@@ -1,12 +1,14 @@
-from twisted.internet import reactor
 from twisted.web.resource import Resource
-from twisted.web.server import Site
+from twisted.web.server import NOT_DONE_YET, Site
+from twisted.web.template import flatten
 
 import sys
 from twisted.python import log
 log.startLogging(sys.stdout)
 
 from axiom.store import Store
+
+from osuchan2.elements import IndexElement
 
 store = Store()
 
@@ -15,10 +17,12 @@ class OCIndex(Resource):
     isLeaf = True
 
     def render_GET(self, request):
-        return "Hi!"
+        element = IndexElement(store)
+        d = flatten(request, element, request.write)
+        d.addCallback(lambda none: request.finish())
+        return NOT_DONE_YET
 
 root = Resource()
 root.putChild("", OCIndex())
 
-reactor.listenTCP(8080, Site(root))
-reactor.run()
+site = Site(root)
