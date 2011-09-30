@@ -1,6 +1,42 @@
 from twisted.web.template import Element, XMLString, renderer, tags
 
+from osuchan2.items import Post, Thread
+
+class FullBoardElement(Element):
+
+    loader = XMLString("""
+        <section
+            xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1"
+            t:render="threads" />
+    """)
+
+    def __init__(self, board):
+        self.board = board
+
+    @renderer
+    def threads(self, request, tag):
+        store = self.board.store
+        threads = store.query(Thread, Thread.board == self.board)
+        return tag(*[ThreadElement(thread) for thread in threads])
+
 class ThreadElement(Element):
+
+    loader = XMLString("""
+        <article
+            xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1"
+            t:render="header" />
+    """)
+
+    def __init__(self, thread):
+        self.thread = thread
+
+    @renderer
+    def header(self, request, tag):
+        subject = "%s - %s [" % (self.thread.author, self.thread.subject)
+        link = tags.a("Reply", href="#")
+        return tag(subject, link, "]")
+
+class FullThreadElement(Element):
 
     loader = XMLString("""
         <section
