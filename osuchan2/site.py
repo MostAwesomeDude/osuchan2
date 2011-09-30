@@ -6,11 +6,19 @@ import sys
 from twisted.python import log
 log.startLogging(sys.stdout)
 
-class OCResource(Resource):
-    pass
+from axiom.store import Store
 
-class OCSite(Site):
-    pass
+store = Store()
 
-reactor.listenTCP(8080, OCSite(OCResource()))
+class OCIndex(Resource):
+
+    isLeaf = True
+
+    def render_GET(self, request):
+        return "Hi!"
+
+root = Resource()
+root.putChild("", OCIndex())
+
+reactor.listenTCP(8080, Site(root))
 reactor.run()
