@@ -1,6 +1,8 @@
 from axiom.item import Item
 from axiom.attributes import integer, path, reference, text, timestamp
 
+from twisted.web.template import tags
+
 class Wordfilter(Item):
     typeName = "badwords"
     schemaVersion = 1
@@ -22,8 +24,9 @@ class Board(Item):
     abbreviation = text(allowNone=False)
     category = reference()
 
-    def tags(self):
-        return u"/%s/ - %s" % (self.abbreviation, self.name)
+    def tags(self, tag):
+        return tag("/", tags.a(self.abbreviation, href=self.abbreviation),
+            "/ - %s" % self.name)
 
 class Thread(Item):
     typeName = "thread"

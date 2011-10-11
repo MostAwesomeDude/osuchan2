@@ -30,7 +30,7 @@ class IndexElement(Element):
     @renderer
     def boards(self, request, tag):
         boards = self.store.query(Board)
-        l = tags.ul(tags.li(board.tags()) for board in boards)
+        l = tags.ul(board.tags(tags.li) for board in boards)
         return tag(l)
 
 class FullBoardElement(Element):
