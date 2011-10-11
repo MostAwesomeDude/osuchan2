@@ -48,22 +48,7 @@ class FullBoardElement(Element):
     def threads(self, request, tag):
         store = self.board.store
         threads = store.query(Thread, Thread.board == self.board)
-        return tag(*[ThreadElement(thread) for thread in threads])
-
-class ThreadElement(Element):
-
-    loader = XMLString("""
-        <article
-            xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1"
-            t:render="header" />
-    """)
-
-    def __init__(self, thread):
-        self.thread = thread
-
-    @renderer
-    def header(self, request, tag):
-        return self.thread.tags(tag)
+        return tag(*[thread.tags(tags.article) for thread in threads])
 
 class FullThreadElement(Element):
 
