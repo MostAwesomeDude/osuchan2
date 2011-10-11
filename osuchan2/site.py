@@ -11,16 +11,22 @@ from axiom.store import Store
 from osuchan2.elements import FullBoardElement, IndexElement
 from osuchan2.items import Board
 
-store = Store()
-
-boards = [u"co", u"d"]
-
 class OCRoot(Resource):
 
     isLeaf = True
 
+    def __init__(self, boards=[], *args, **kwargs):
+        Resource.__init__(self)
+
+        self.store = Store(*args, **kwargs)
+
+        for abbreviation, name in boards:
+            board = Board(store=self.store, abbreviation=abbreviation,
+                name=name)
+            self.putChild(abbreviation, OCBoard(board))
+
     def render_GET(self, request):
-        element = IndexElement(store)
+        element = IndexElement(self.store)
         d = flatten(request, element, request.write)
         d.addCallback(lambda none: request.finish())
         return NOT_DONE_YET
@@ -29,8 +35,8 @@ class OCBoard(Resource):
 
     isLeaf = True
 
-    def __init__(self, board_name):
-        self.board = store.findOrCreate(Board, abbreviation=board_name)
+    def __init__(self, board):
+        self.board = board
 
     def render_GET(self, request):
         element = FullBoardElement(self.board)
@@ -38,10 +44,10 @@ class OCBoard(Resource):
         d.addCallback(lambda none: request.finish())
         return NOT_DONE_YET
 
+boards = [
+    (u"co", u"Comic"),
+]
+
 root = Resource()
-root.putChild("", OCRoot())
-
-for board in boards:
-    root.putChild(board, OCBoard(board))
-
+root.putChild("", OCRoot(boards=boards))
 site = Site(root)
