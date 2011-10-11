@@ -63,9 +63,7 @@ class ThreadElement(Element):
 
     @renderer
     def header(self, request, tag):
-        subject = "%s - %s [" % (self.thread.author, self.thread.subject)
-        link = tags.a("Reply", href="#")
-        return tag(subject, link, "]")
+        return self.thread.tags(tag)
 
 class FullThreadElement(Element):
 

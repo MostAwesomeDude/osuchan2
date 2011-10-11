@@ -35,6 +35,15 @@ class Thread(Item):
     subject = text()
     board = reference()
 
+    def tags(self, tag):
+        first = self.store.findFirst(Post, Post.thread == self)
+        if first is None:
+            return tag(u"Empty thread")
+        else:
+            subject = u"%s - %s [" % (first.author, self.subject)
+            link = tags.a("Reply", href="#")
+            return tag(subject, link, "]")
+
 class Post(Item):
     typeName = "post"
     schemaVersion = 1
