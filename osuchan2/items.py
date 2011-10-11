@@ -22,6 +22,9 @@ class Board(Item):
     abbreviation = text(allowNone=False)
     category = reference()
 
+    def tags(self):
+        return u"/%s/ - %s" % (self.abbreviation, self.name)
+
 class Thread(Item):
     typeName = "thread"
     schemaVersion = 1

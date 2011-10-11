@@ -12,37 +12,26 @@ class IndexElement(Element):
             </head>
             <body>
                 <header t:render="title" />
+                <div>
+                    <section t:render="boards" />
+                </div>
                 <footer>(c) GPLv2</footer>
             </body>
         </html>
-    """)
-
-    def __init__(self, body):
-        self.body_element = body
-
-    @renderer
-    def title(self, request, tag):
-        return tag("OSUChan")
-
-    @renderer
-    def body(self, request, tag):
-        return tag(self.body_element)
-
-class BoardElement(Element):
-
-    loader = XMLString("""
-        <section
-            xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1"
-            t:render="boards" />
     """)
 
     def __init__(self, store):
         self.store = store
 
     @renderer
+    def title(self, request, tag):
+        return tag("OSUChan")
+
+    @renderer
     def boards(self, request, tag):
         boards = self.store.query(Board)
-        return tag(*[BoardElement(board) for board in boards])
+        l = tags.ul(tags.li(board.tags()) for board in boards)
+        return tag(l)
 
 class FullBoardElement(Element):
 
