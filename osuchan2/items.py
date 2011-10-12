@@ -42,16 +42,33 @@ class Thread(Item):
         else:
             subject = u"%s - %s [" % (first.author, self.subject)
             link = tags.a("Reply", href="#")
-            return tag(subject, link, "]")
+            header = tags.header(subject, link, "]")
+
+            post = first.tags(tags.div)
+
+            # Retrieve posts and reverse them twice, to avoid having to get
+            # the length of the table.
+            others = self.store.query(Post, Post.thread == self, limit=4,
+                sort=Post.timestamp.descending)
+            posts = [p.tags(tags.div) for p in others]
+            posts.reverse()
+
+            return tag(header, post, *posts)
 
 class Post(Item):
     typeName = "post"
     schemaVersion = 1
 
-    number = integer()
+    number = integer(allowNone=False)
     author = text(allowNone=False)
     thread = reference(allowNone=False)
-    timestamp = timestamp()
+    timestamp = timestamp(allowNone=False)
     comment = text()
     email = text()
     file = path()
+
+    def tags(self, tag):
+        author = tags.span(self.author, class_="author")
+        timestamp = self.timestamp.asDatetime().strftime("%m/%d/%y(%a)%H:%M")
+        number = "No. %d" % self.number
+        return tag(author, timestamp, number, self.comment)
