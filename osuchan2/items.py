@@ -49,8 +49,8 @@ class Thread(Item):
             # Retrieve posts and reverse them twice, to avoid having to get
             # the length of the table.
             others = self.store.query(Post, Post.thread == self, limit=4,
-                sort=Post.timestamp.descending)
-            posts = [p.tags(tags.div) for p in others]
+                sort=Post.number.descending)
+            posts = [p.tags(tags.div) for p in others if p is not first]
             posts.reverse()
 
             return tag(header, post, *posts)
@@ -71,4 +71,5 @@ class Post(Item):
         author = tags.span(self.author, class_="author")
         timestamp = self.timestamp.asDatetime().strftime("%m/%d/%y(%a)%H:%M")
         number = "No. %d" % self.number
-        return tag(author, timestamp, number, self.comment)
+        comment = tags.p(self.comment)
+        return tag(author, timestamp, number, comment)
